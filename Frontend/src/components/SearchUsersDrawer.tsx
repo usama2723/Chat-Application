@@ -4,16 +4,11 @@ import {
   Box,
   Drawer,
   Dialog,
-  Avatar,
   IconButton,
   Toolbar,
   Typography,
   Button,
-  List,
-  ListItem,
   TextField,
-  ListItemText,
-  ListItemAvatar,
 } from "@mui/material";
 import { IoSearch } from "react-icons/io5";
 import { toast } from "react-toastify";
@@ -22,6 +17,13 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ChatState } from "../Context/ChatProvider";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
+import UserListItem from "./UserAvatar/UserListItem";
+interface UserInfo {
+  _id: string;
+  name: string;
+  email: string;
+  avatar: string;
+}
 
 export const SearchUsersDrawer = ({
   openNewChatsDrawer,
@@ -36,9 +38,9 @@ export const SearchUsersDrawer = ({
 }) => {
 
   const [loading, setLoading] = useState(false);
-  const [loadingChat, setLoadingChat] = useState(false);
+  // const [loadingChat, setLoadingChat] = useState(false);
   const { setSelectedChat, user, chats, setChats } = ChatState();
-  const [searchResult, setSearchResult] = useState([]);
+  const [searchResult, setSearchResult] = useState<UserInfo[]>([]);
   const [search, setSearch] = useState("");
 
   const handleSearch = async () => {
@@ -46,11 +48,15 @@ export const SearchUsersDrawer = ({
       toast.error("Please Enter Something in Search");
       return;
     }
+    if (!user?.token) {
+      toast.error("User not authenticated");
+      return;
+    }
     try {
       setLoading(true);
       const config = {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${user?.token}`,
         },
       };
 
@@ -69,12 +75,17 @@ export const SearchUsersDrawer = ({
 
   const accessChat = async (userId: string) => {
     console.log(userId);
+    if (!user?.token) {
+      toast.error("User not authenticated");
+      return;
+    }
+
 
     try {
       const config = {
         headers: {
           "Content-type": "application/json",
-          Authorization: `Bearer ${user?.user}`,
+          Authorization: `Bearer ${user?.token}`,
         },
       };
       const { data } = await axios.post(
@@ -82,10 +93,11 @@ export const SearchUsersDrawer = ({
         { userId },
         config
       );
-      setSelectedChat(data);
+     
 
-      if (!chats.filter((c) => c._id === data._id)) {
+      if (!chats.find((c) => c._id === data._id)) {
         setChats([data, ...chats]);
+        setSelectedChat(data);
       }
     } catch (error) {
       toast.error("error");
@@ -210,27 +222,14 @@ export const SearchUsersDrawer = ({
         role="presentation"
       >
         {loading ? <ChatLoading /> : (
-          <List>
-            {searchResult?.map((user) => (
-              <ListIem
-                key={user}
-                onClick={() => accessChat(user)}
-                sx={{
-                  padding: 2,
-                  "&:hover": {
-                    backgroundColor: "#394b53",
-                  },
-                }}
-              >
-                <ListItemAvatar>
-                  <Avatar src={user.imageUrl} alt={user.name} />
-                </ListItemAvatar>
-                <ListItemText primary={user.name} />
-              </ListIem>
-            ))}
-          </List>
-        )}
-
+        searchResult?.map((user) => (
+            <UserListItem
+            key={user._id}
+            user={user}
+            handleFunction={() => accessChat(user._id)}
+              />
+        ))
+      )}
       </Box>
     </Drawer>
   );

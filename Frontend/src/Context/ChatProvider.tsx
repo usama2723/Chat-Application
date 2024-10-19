@@ -5,8 +5,14 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-
 import { useNavigate } from "react-router-dom";
+
+interface UserInfo {
+  email: string;
+  password: string;
+  token: string;
+  name: string;
+}
 
 interface ChatContextProps {
   user: UserInfo | null;
@@ -17,20 +23,17 @@ interface ChatContextProps {
   setSelectedChat?: React.Dispatch<React.SetStateAction<IChat | undefined>>;
 }
 
-interface UserInfo {
-    user: {
-    email: "";
-    password: "";
-    token: "";
-    name: "";
-    
-  };
+interface IChat {
+  _id: string;
+  message: string;
 }
+
+// Initial Context Value
 const initialContextValue: ChatContextProps = {
   user: null,
-  setUser: () => {},
+  setUser: () => { },
   chats: [],
-  setChats() {},
+  setChats: () => { },
 };
 
 const ChatContext = createContext<ChatContextProps>(initialContextValue);
@@ -38,26 +41,24 @@ const ChatContext = createContext<ChatContextProps>(initialContextValue);
 interface ChatProviderProps {
   children: ReactNode;
 }
-interface IChat {
-  _id: string;
-  message: string;
-}
-interface ChatState {
-  messages: string[];
-}
 
 const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [chats, setChats] = useState<IChat[]>([]);
-  const [user, setUser] = useState<UserInfo | null>(null);
-  const [selectedChat, setSelectedChat] = useState<IChat>();
+  const [user, setUser] = useState<UserInfo | null>(null); 
+  const [selectedChat, setSelectedChat] = useState<IChat | undefined>();
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Parse the user info from localStorage
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
-    setUser(userInfo);
+    console.log("Retrieved user info:", userInfo); 
 
-    if (!userInfo) navigate("/signin");
+    if (userInfo) {
+      setUser(userInfo);
+    } else {
+      navigate("/signin"); // Redirect to sign in if no user found
+    }
   }, [navigate]);
 
   return (
@@ -69,9 +70,9 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   );
 };
 
+// Hook to use ChatState
 export const ChatState = () => {
   return useContext(ChatContext);
 };
 
 export default ChatProvider;
-
