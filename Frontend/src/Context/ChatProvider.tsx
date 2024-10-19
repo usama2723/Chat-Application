@@ -7,7 +7,8 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface UserInfo {
+export interface UserInfo {
+  _id: string;
   email: string;
   password: string;
   token: string;

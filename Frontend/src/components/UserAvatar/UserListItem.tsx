@@ -1,16 +1,13 @@
 import React from 'react';
 import { Avatar, Box, Typography, Paper } from '@mui/material';
+import { UserInfo } from '../../Context/ChatProvider';
 // import { ChatState } from '../../Context/ChatProvider';
 
 interface UserListItemProps {
     handleFunction: () => void; 
-    user: User;
+    user: UserInfo;
 }
-interface User {
-    name: string;
-    email: string;
-    pic: string;
-}
+
 
 const UserListItem: React.FC<UserListItemProps> = ({user, handleFunction }) => {
     

@@ -18,12 +18,6 @@ import { ChatState } from "../Context/ChatProvider";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "./UserAvatar/UserListItem";
-interface UserInfo {
-  _id: string;
-  name: string;
-  email: string;
-  avatar: string;
-}
 
 export const SearchUsersDrawer = ({
   openNewChatsDrawer,
