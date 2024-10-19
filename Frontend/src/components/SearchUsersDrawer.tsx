@@ -71,8 +71,6 @@ export const SearchUsersDrawer = ({
     }
   };
 
-
-
   const accessChat = async (userId: string) => {
     console.log(userId);
     if (!user?.token) {

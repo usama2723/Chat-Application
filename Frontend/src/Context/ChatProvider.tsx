@@ -12,6 +12,7 @@ interface UserInfo {
   password: string;
   token: string;
   name: string;
+  pic: string;
 }
 
 interface ChatContextProps {
@@ -34,6 +35,8 @@ const initialContextValue: ChatContextProps = {
   setUser: () => { },
   chats: [],
   setChats: () => { },
+  selectedChat: undefined,
+  setSelectedChat: () => {},
 };
 
 const ChatContext = createContext<ChatContextProps>(initialContextValue);
@@ -57,7 +60,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     if (userInfo) {
       setUser(userInfo);
     } else {
-      navigate("/signin"); // Redirect to sign in if no user found
+      navigate("/sign-in"); // Redirect to sign in if no user found
     }
   }, [navigate]);
 

@@ -45,11 +45,11 @@ const SignUp = () => {
     console.log(Obj);
 
     axios
-      .post(`${import.meta.env.VITE_API_BASE_URL}/user/signup`, Obj)
+      .post(`${import.meta.env.VITE_API_BASE_URL}/user/sign-up`, Obj)
       .then(() => {
         toast.success("Account Created");
         localStorage.setItem("userInfo", JSON.stringify(Obj));
-        navigate("/signin");
+        navigate("/sign-in");
       })
       .catch(() => {
         toast.error("error when signing up");
@@ -174,7 +174,7 @@ const SignUp = () => {
         <p className="text-gray-500 dark:text-gray-400 text-center">
           Already a member?
           <Link
-            to={"/signin"}
+            to={"/sign-in"}
             className=" ml-2 font-medium text-blue-600 underline dark:text-blue-500 hover:no-underline"
           >
             Sign In

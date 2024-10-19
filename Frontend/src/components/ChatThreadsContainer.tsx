@@ -51,7 +51,7 @@ export const ChatThreadsContainer = () => {
   };
 
   const handleLogout = () => {
-    navigate("/signin");
+    navigate("/sign-in");
     toast.success("Logged out successfully!");
     localStorage.removeItem("userInfo");
   };
