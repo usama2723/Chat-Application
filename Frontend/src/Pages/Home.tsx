@@ -1,5 +1,5 @@
 import { ChatThreadsContainer } from "../components/ChatThreadsContainer";
-import { ConversationContainer } from "../components/ConversationContainer";
+// import { ConversationContainer } from "../components/ConversationContainer";
 
 const Home = () => {
   return (
@@ -7,10 +7,10 @@ const Home = () => {
       <div className="w-[30%] bg-[#111b21] text-white border-r overflow-y-scroll border-[#394b53] ">
         <ChatThreadsContainer />
       </div>
-
+{/* 
       <div className="container flex-1 flex flex-col ">
         <ConversationContainer />
-      </div>
+      </div> */}
     </div>
   );
 };

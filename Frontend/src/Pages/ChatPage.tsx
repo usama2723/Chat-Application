@@ -11,11 +11,11 @@ const ChatPage = () => {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
   const fetchChats = async () => {
-    console.log(user._id);
+    console.log(user?.user);
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${user._id}`,
         },
       };
 
@@ -31,9 +31,13 @@ const ChatPage = () => {
     }
   };
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
+    const storedUserInfo = localStorage.getItem("userInfo");
+    if (storedUserInfo) {
+      setLoggedUser(JSON.parse(storedUserInfo));
+    }
     fetchChats();
-  });
+  }, [user]);
+
   function ImageAvatars() {
     return (
       <Stack direction="row" spacing={2}>

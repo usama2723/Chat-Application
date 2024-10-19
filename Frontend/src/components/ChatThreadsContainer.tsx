@@ -16,11 +16,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { SearchUsersDrawer } from "./SearchUsersDrawer";
-import { ChatState } from "../Context/ChatProvider";
+// import { ChatState } from "../Context/ChatProvider";
 // import axios from "axios";
 
 export const ChatThreadsContainer = () => {
-  const { chats } = ChatState();
+  // const { chats } = ChatState();
+  
   const [openModal, setOpenModal] = useState(false);
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const [openNewChatsDrawer, setOpenNewChatsDrawer] = React.useState(false);
@@ -109,9 +110,8 @@ export const ChatThreadsContainer = () => {
       </div>
 
       <div className="flex-1 overflow-y-scroll">
-        {chats.map((chat, index) => (
-          <SearchUsersDrawer key={index} {...chat} />
-        ))}
+       
+  
       </div>
 
       <Drawer
@@ -185,7 +185,7 @@ export const ChatThreadsContainer = () => {
               color: "gray",
             }}
           >
-            This is not your username or pin. This name will be vsible to your
+            This is not your username or pin. This name will be visible to your
             contacts.
           </Typography>
           <Typography
@@ -219,8 +219,7 @@ export const ChatThreadsContainer = () => {
     </>
   );
 };
-
-// const contacts = [
+//   const contacts = [
 //   {
 //     name: "Umer",
 //     status: "Online",
@@ -269,4 +268,4 @@ export const ChatThreadsContainer = () => {
 //     imageUrl:
 //       "https://imgv3.fotor.com/images/gallery/Realistic-Male-Profile-Picture.jpg",
 //   },
-// ];
+//  ];

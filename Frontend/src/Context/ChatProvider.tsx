@@ -18,10 +18,12 @@ interface ChatContextProps {
 }
 
 interface UserInfo {
-  user: {
+    user: {
     email: "";
     password: "";
     token: "";
+    name: "";
+    
   };
 }
 const initialContextValue: ChatContextProps = {
@@ -55,7 +57,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
     setUser(userInfo);
 
-    // if (!userInfo) navigate("/signin");
+    if (!userInfo) navigate("/signin");
   }, [navigate]);
 
   return (
@@ -72,3 +74,4 @@ export const ChatState = () => {
 };
 
 export default ChatProvider;
+

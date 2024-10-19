@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes} from "react-router-dom";
 import Home from "./Pages/Home";
 import ChatPage from "./Pages/ChatPage";
 import SignUp from "./components/Authentication/SignUp";
@@ -11,7 +11,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/chats" element={<ChatPage />} />
-        <Route path="signup" element={<SignUp />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
       </Routes>
       <ToastContainer

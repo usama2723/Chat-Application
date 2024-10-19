@@ -21,6 +21,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ChatState } from "../Context/ChatProvider";
 import axios from "axios";
+import ChatLoading from "./ChatLoading";
 
 export const SearchUsersDrawer = ({
   openNewChatsDrawer,
@@ -33,15 +34,23 @@ export const SearchUsersDrawer = ({
   openModal: boolean;
   setOpenModal: Dispatch<SetStateAction<boolean>>;
 }) => {
+
+  const [loading, setLoading] = useState(false);
+  const [loadingChat, setLoadingChat] = useState(false);
   const { setSelectedChat, user, chats, setChats } = ChatState();
   const [searchResult, setSearchResult] = useState([]);
   const [search, setSearch] = useState("");
 
   const handleSearch = async () => {
+    if (!search) {
+      toast.error("Please Enter Something in Search");
+      return;
+    }
     try {
+      setLoading(true);
       const config = {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${user.token}`,
         },
       };
 
@@ -49,11 +58,14 @@ export const SearchUsersDrawer = ({
         `${import.meta.env.VITE_API_BASE_URL}/user?search=${search}`,
         config
       );
+      setLoading(false);
       setSearchResult(data);
     } catch (error) {
       toast.error("error");
     }
   };
+
+
 
   const accessChat = async (userId: string) => {
     console.log(userId);
@@ -62,7 +74,7 @@ export const SearchUsersDrawer = ({
       const config = {
         headers: {
           "Content-type": "application/json",
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${user?.user}`,
         },
       };
       const { data } = await axios.post(
@@ -126,8 +138,8 @@ export const SearchUsersDrawer = ({
             fullWidth
             variant="outlined"
             label="Search user"
-            // value={search}
-            // onChange={(e) => handleSearch(e.target.value)}
+          // value={search}
+          // onChange={(e) => handleSearch(e.target.value)}
           />
         </Box>
         <Box>
@@ -140,8 +152,8 @@ export const SearchUsersDrawer = ({
             fullWidth
             variant="outlined"
             label="Enter name"
-            // value={input2}
-            // onChange={(e) => handleInput2Change(e.target.value)}
+          // value={input2}
+          // onChange={(e) => handleInput2Change(e.target.value)}
           />
           <Button
             variant="contained"
@@ -158,6 +170,7 @@ export const SearchUsersDrawer = ({
           </Button>
         </Box>
       </Dialog>
+
       <AppBar
         position="static"
         sx={{ backgroundColor: "#202c33", height: 110 }}
@@ -196,25 +209,28 @@ export const SearchUsersDrawer = ({
         }}
         role="presentation"
       >
-        <List>
-          {searchResult?.map((user) => (
-            <ListItem
-              key={user._id}
-              onClick={() => accessChat(user._id)}
-              sx={{
-                padding: 2,
-                "&:hover": {
-                  backgroundColor: "#394b53",
-                },
-              }}
-            >
-              <ListItemAvatar>
-                <Avatar src={user.imageUrl} alt={user.name} />
-              </ListItemAvatar>
-              <ListItemText primary={user.name} />
-            </ListItem>
-          ))}
-        </List>
+        {loading ? <ChatLoading /> : (
+          <List>
+            {searchResult?.map((user) => (
+              <ListIem
+                key={user}
+                onClick={() => accessChat(user)}
+                sx={{
+                  padding: 2,
+                  "&:hover": {
+                    backgroundColor: "#394b53",
+                  },
+                }}
+              >
+                <ListItemAvatar>
+                  <Avatar src={user.imageUrl} alt={user.name} />
+                </ListItemAvatar>
+                <ListItemText primary={user.name} />
+              </ListIem>
+            ))}
+          </List>
+        )}
+
       </Box>
     </Drawer>
   );
