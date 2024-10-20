@@ -45,10 +45,17 @@ const SignUp = () => {
     console.log(Obj);
 
     axios
-      .post(`${import.meta.env.VITE_API_BASE_URL}/user/sign-up`, Obj)
+      .post(`${import.meta.env.VITE_API_BASE_URL}/user/signup`, Obj)
       .then(() => {
         toast.success("Account Created");
-        localStorage.setItem("userInfo", JSON.stringify(Obj));
+        const existingUsers = JSON.parse(localStorage.getItem("userInfo") || "[]");
+
+        // Append the new user to the array
+        const updatedUsers = [...existingUsers, Obj];
+
+        // Save the updated array of users back to localStorage
+        localStorage.setItem("userInfo", JSON.stringify(updatedUsers));
+
         navigate("/sign-in");
       })
       .catch(() => {
