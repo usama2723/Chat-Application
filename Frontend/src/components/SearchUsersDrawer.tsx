@@ -32,9 +32,8 @@ export const SearchUsersDrawer = ({
 }) => {
 
   const [loading, setLoading] = useState(false);
-  // const [loadingChat, setLoadingChat] = useState(false);
   const { setSelectedChat, user, chats, setChats } = ChatState();
-  const [searchResult, setSearchResult] = useState<UserInfo[]>([]);
+  const [searchResult, setSearchResult] = useState([]);
   const [search, setSearch] = useState("");
 
   const handleSearch = async () => {
@@ -43,9 +42,12 @@ export const SearchUsersDrawer = ({
       return;
     }
     if (!user?.token) {
+      console.log("Token:", user?.token);
       toast.error("User not authenticated");
       return;
     }
+    console.log("user is",user);
+
     try {
       setLoading(true);
       const config = {
@@ -53,11 +55,15 @@ export const SearchUsersDrawer = ({
           Authorization: `Bearer ${user?.token}`,
         },
       };
+      console.log("Authorization Token:", user?.token);
+
 
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/user?search=${search}`,
         config
       );
+      console.log("Search Result Data:", data);
+    
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -71,7 +77,6 @@ export const SearchUsersDrawer = ({
       toast.error("User not authenticated");
       return;
     }
-
 
     try {
       const config = {
@@ -97,7 +102,16 @@ export const SearchUsersDrawer = ({
   };
 
   console.log({ openNewChatsDrawer });
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
 
+
+    if (e.target.value.trim() !== "") {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  };
   return (
     <Drawer
       variant="persistent"
@@ -196,7 +210,7 @@ export const SearchUsersDrawer = ({
                 type="text"
                 placeholder="Search new chats"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={handleSearchChange}
               />
               <IoSearch
                 onClick={handleSearch}
@@ -208,12 +222,19 @@ export const SearchUsersDrawer = ({
         </Toolbar>
       </AppBar>
       <Box
-        sx={{
-          width: 450,
-        }}
+            sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center', // Center the list items horizontally
+        justifyContent: 'center',
+        marginTop: 4,
+        width: 450,
+      }}
+
         role="presentation"
       >
         {loading ? <ChatLoading /> : (
+
         searchResult?.map((user) => (
             <UserListItem
             key={user._id}
@@ -221,8 +242,12 @@ export const SearchUsersDrawer = ({
             handleFunction={() => accessChat(user._id)}
               />
         ))
+        
       )}
+    
       </Box>
     </Drawer>
+    
   );
+  
 };
