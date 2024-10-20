@@ -16,12 +16,13 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { SearchUsersDrawer } from "./SearchUsersDrawer";
+import ChatLoading from "./ChatLoading";
 // import { ChatState } from "../Context/ChatProvider";
 // import axios from "axios";
 
 export const ChatThreadsContainer = () => {
   // const { chats } = ChatState();
-  
+  const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const [openNewChatsDrawer, setOpenNewChatsDrawer] = React.useState(false);
@@ -53,7 +54,9 @@ export const ChatThreadsContainer = () => {
   const handleLogout = () => {
     navigate("/sign-in");
     toast.success("Logged out successfully!");
-    localStorage.removeItem("userInfo");
+
+    // localStorage.removeItem("userInfo");
+
   };
 
   const options = [
@@ -61,7 +64,16 @@ export const ChatThreadsContainer = () => {
     { label: "Group chat", callback: handleCloseModal },
     { label: "Log out", callback: handleLogout },
   ];
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
 
+    
+    if (e.target.value.trim() !== "") {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  };
   return (
     <>
       <div className="bg-[#202c33] flex items-center justify-between text-white h-16 pl-3 ">
@@ -104,14 +116,14 @@ export const ChatThreadsContainer = () => {
             type="text"
             placeholder="Search or start new chat"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
       </div>
 
       <div className="flex-1 overflow-y-scroll">
-       
-  
+        {loading && <ChatLoading />}
+
       </div>
 
       <Drawer
