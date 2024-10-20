@@ -24,12 +24,10 @@ interface ChatContextProps {
   selectedChat?: IChat;
   setSelectedChat?: React.Dispatch<React.SetStateAction<IChat | undefined>>;
 }
-
 interface IChat {
   _id: string;
   message: string;
 }
-
 // Initial Context Value
 const initialContextValue: ChatContextProps = {
   user: null,
@@ -58,7 +56,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
     console.log("Retrieved user info:", userInfo); 
 
-    if (userInfo) {
+    if (userInfo && userInfo.email) {
       setUser(userInfo);
     } else {
       navigate("/sign-in"); // Redirect to sign in if no user found
@@ -73,7 +71,6 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     </ChatContext.Provider>
   );
 };
-
 // Hook to use ChatState
 export const ChatState = () => {
   return useContext(ChatContext);
