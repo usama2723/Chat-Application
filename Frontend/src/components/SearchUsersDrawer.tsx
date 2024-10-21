@@ -9,12 +9,13 @@ import {
   Typography,
   Button,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { IoSearch } from "react-icons/io5";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { ChatState } from "../Context/ChatProvider";
+import { ChatState,  } from "../Context/ChatProvider";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "./UserAvatar/UserListItem";
@@ -30,10 +31,10 @@ export const SearchUsersDrawer = ({
   openModal: boolean;
   setOpenModal: Dispatch<SetStateAction<boolean>>;
 }) => {
-
+  const [loadingChat, setLoadingChat] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setSelectedChat, user, chats, setChats } = ChatState();
-  const [searchResult, setSearchResult] = useState([]);
+  const [searchResult, setSearchResult] = useState();
   const [search, setSearch] = useState("");
 
   const handleSearch = async () => {
@@ -41,11 +42,7 @@ export const SearchUsersDrawer = ({
       toast.error("Please Enter Something in Search");
       return;
     }
-    if (!user?.token) {
-      console.log("Token:", user?.token);
-      toast.error("User not authenticated");
-      return;
-    }
+   
     console.log("user is",user);
 
     try {
@@ -71,14 +68,11 @@ export const SearchUsersDrawer = ({
     }
   };
 
-  const accessChat = async (userId: string) => {
-    console.log(userId);
-    if (!user?.token) {
-      toast.error("User not authenticated");
-      return;
-    }
+  const accessChat = async (userId : string) => {
+    console.log("user :", userId);
 
     try {
+      setLoadingChat(true);
       const config = {
         headers: {
           "Content-type": "application/json",
@@ -86,25 +80,24 @@ export const SearchUsersDrawer = ({
         },
       };
       const { data } = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/chat`,
+        `${import.meta.env.VITE_API_BASE_URL}/chat`,
         { userId },
         config
       );
-     
 
-      if (!chats.find((c) => c._id === data._id)) {
-        setChats([data, ...chats]);
-        setSelectedChat(data);
-      }
+      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      setSelectedChat(data);
+      console.log(data);
+      setOpenNewChatsDrawer(false);
+      setLoadingChat(false);
     } catch (error) {
-      toast.error("error");
+      toast.error('Error loading chats');
     }
   };
 
   console.log({ openNewChatsDrawer });
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-
 
     if (e.target.value.trim() !== "") {
       setLoading(true);
@@ -225,7 +218,7 @@ export const SearchUsersDrawer = ({
             sx={{
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center', // Center the list items horizontally
+        alignItems: 'center', 
         justifyContent: 'center',
         marginTop: 4,
         width: 450,
@@ -242,9 +235,8 @@ export const SearchUsersDrawer = ({
             handleFunction={() => accessChat(user._id)}
               />
         ))
-        
       )}
-    
+        {loadingChat && <CircularProgress color="inherit" size={50} />}
       </Box>
     </Drawer>
     
