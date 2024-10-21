@@ -22,12 +22,16 @@ interface ChatContextProps {
   chats: IChat[];
   setChats: React.Dispatch<React.SetStateAction<IChat[]>>;
   selectedChat?: IChat;
-  setSelectedChat?: React.Dispatch<React.SetStateAction<IChat | undefined>>;
+  setSelectedChat: React.Dispatch<React.SetStateAction<IChat | undefined>>;
 }
-interface IChat {
+export interface IChat {
   _id: string;
-  message: string;
+  chatName: string;
+  isGroupChat: boolean; // Added to resolve issue
+  users: UserInfo[]; // Assuming each chat has an array of users
+  latestMessage?: string;
 }
+
 // Initial Context Value
 const initialContextValue: ChatContextProps = {
   user: null,
@@ -52,16 +56,25 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Parse the user info from localStorage
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
     console.log("Retrieved user info:", userInfo); 
 
-    if (userInfo && userInfo.email) {
+    if (userInfo) {
       setUser(userInfo);
     } else {
-      navigate("/sign-in"); // Redirect to sign in if no user found
+      navigate("/sign-in"); 
     }
   }, [navigate]);
+  const saveUserToLocalStorage = (userData: UserInfo) => {
+    localStorage.setItem("userInfo", JSON.stringify(userData));
+  };
+
+  // Whenever the user state changes, we save it to localStorage
+  useEffect(() => {
+    if (user) {
+      saveUserToLocalStorage(user);
+    }
+  }, [user]);
 
   return (
     <ChatContext.Provider
@@ -71,7 +84,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     </ChatContext.Provider>
   );
 };
-// Hook to use ChatState
+
 export const ChatState = () => {
   return useContext(ChatContext);
 };
