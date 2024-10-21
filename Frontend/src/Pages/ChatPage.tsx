@@ -1,65 +1,31 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Box } from "@mui/material";
+import { useState } from "react";
 import { ChatState } from "../Context/ChatProvider";
-import Avatar from "@mui/material/Avatar";
-import Stack from "@mui/material/Stack";
+import { SearchUsersDrawer } from "../components/SearchUsersDrawer";
+import { ChatThreadsContainer } from "../components/ChatThreadsContainer";
+import ConversationContainer from "../components/ConversationContainer";
 
 const ChatPage = () => {
-  const [loggedUser, setLoggedUser] = useState();
-  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const { user } = ChatState();
 
-  const fetchChats = async () => {
-    console.log(user?.user);
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user._id}`,
-        },
-      };
+  const [openNewChatsDrawer, setOpenNewChatsDrawer] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/chat`,
-        config
-      );
-      console.log(data);
-
-      setChats(data);
-    } catch (error) {
-      toast.error("error");
-    }
-  };
-  useEffect(() => {
-    const storedUserInfo = localStorage.getItem("userInfo");
-    if (storedUserInfo) {
-      setLoggedUser(JSON.parse(storedUserInfo));
-    }
-    fetchChats();
-  }, [user]);
-
-  function ImageAvatars() {
-    return (
-      <Stack direction="row" spacing={2}>
-        <Avatar
-          src={imageUrl}
-          sx={{
-            height: "47px",
-            width: "47px",
-          }}
-        />
-      </Stack>
-    );
-  }
   return (
-    <div className=" p-3 hover:bg-[#394b53] cursor-pointer  border-b border-[#394b53]">
-      <div className="flex items-center space-x-4">
-        <ImageAvatars />
-        <div>
-          <p className="text-lg text-white  ">{name}</p>
-          <p className="text-xs text-gray-500">{status}</p>
-        </div>
-      </div>
+    <div style={{ width: "100%" }}>
+      {user && (
+        <SearchUsersDrawer
+          openNewChatsDrawer={openNewChatsDrawer}
+          setOpenNewChatsDrawer={setOpenNewChatsDrawer}
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+        />
+      )}
+      <Box>
+        {user && <ChatThreadsContainer />}
+        {user && <ConversationContainer/>}
+
+      </Box>
     </div>
   );
 };
