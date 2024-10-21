@@ -6,8 +6,10 @@ import {
   IconButton,
   Toolbar,
   Typography,
+  Stack,
+  Paper,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoChatbubble, IoPeople, IoSearch } from "react-icons/io5";
 import { CustomMenu } from "./CustomMenu";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -17,11 +19,14 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { SearchUsersDrawer } from "./SearchUsersDrawer";
 import ChatLoading from "./ChatLoading";
-// import { ChatState } from "../Context/ChatProvider";
-// import axios from "axios";
+import { ChatState, UserInfo } from "../Context/ChatProvider";
+import axios from "axios";
+import { getSender } from "../config/ChatLogics";
 
 export const ChatThreadsContainer = () => {
-  // const { chats } = ChatState();
+
+  const [loggedUser, setLoggedUser] = useState<UserInfo | null>(null);
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [openDrawer, setOpenDrawer] = React.useState(false);
@@ -58,6 +63,34 @@ export const ChatThreadsContainer = () => {
     // localStorage.removeItem("userInfo");
 
   };
+  const fetchChats = async () => {
+    console.log("user id is", user?._id);
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      };
+
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/chat`, config);
+      setChats(data);
+      console.log(data);
+
+    } catch (error) {
+      toast.error("Erruuuuor");
+    }
+  };
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      setLoggedUser(JSON.parse(userInfo));
+    } else {
+      setLoggedUser(null);
+    }
+    fetchChats();
+  }, []);
+
 
   const options = [
     { label: "New chats", callback: toggleNewChatsDrawer },
@@ -66,14 +99,20 @@ export const ChatThreadsContainer = () => {
   ];
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+    setLoading(true);
 
-    
-    if (e.target.value.trim() !== "") {
-      setLoading(true);
-    } else {
+    if (e.target.value.trim() === "") {
       setLoading(false);
     }
   };
+
+  const filteredChats = chats.filter((chat) => {
+    const senderName = !chat.isGroupChat
+      ? getSender(loggedUser, chat.users)
+      : chat.chatName;
+
+    return senderName && senderName.toLowerCase().includes(search.toLowerCase()); 
+  });
   return (
     <>
       <div className="bg-[#202c33] flex items-center justify-between text-white h-16 pl-3 ">
@@ -122,8 +161,42 @@ export const ChatThreadsContainer = () => {
       </div>
 
       <div className="flex-1 overflow-y-scroll">
-        {loading && <ChatLoading />}
-
+        {loading ? (
+          <ChatLoading />
+        ) : filteredChats.length > 0 ? (
+          <Stack spacing={2} alignItems="center" justifyContent="center">
+            {filteredChats.map((chat) => (
+              <Paper
+                elevation={3}
+                key={chat._id}
+                sx={{
+                  backgroundColor: selectedChat === chat ? "white" : "#E8E8E8",
+                  color: selectedChat === chat ? "black" : "black",
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "#38B2AC",
+                    color: "white",
+                  },
+                  width: "90%",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: 2,
+                  marginBottom: 2,
+                  borderRadius: "8px",
+                }}
+                onClick={() => setSelectedChat(chat)}
+              >
+                <Typography>
+                  {!chat.isGroupChat
+                    ? getSender(loggedUser, chat.users)
+                    : chat.chatName}
+                </Typography>
+              </Paper>
+            ))}
+          </Stack>
+        ) : (
+          <ChatLoading />
+        )}
       </div>
 
       <Drawer
