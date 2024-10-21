@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { UserInfo } from "../../Context/ChatProvider";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -47,14 +48,19 @@ const SignUp = () => {
     axios
       .post(`${import.meta.env.VITE_API_BASE_URL}/user/signup`, Obj)
       .then(() => {
+        const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
+
+        // Check if user already exists
+        const userExists = existingUsers.some((user: UserInfo) => user.email === Obj.email);
+
+        if (userExists) {
+          toast.error("User already exists");
+          return;
+        }
+        existingUsers.push(Obj);
+
+        localStorage.setItem("users", JSON.stringify(existingUsers));
         toast.success("Account Created");
-        const existingUsers = JSON.parse(localStorage.getItem("userInfo") || "[]");
-
-        // Append the new user to the array
-        const updatedUsers = [...existingUsers, Obj];
-
-        // Save the updated array of users back to localStorage
-        localStorage.setItem("userInfo", JSON.stringify(updatedUsers));
 
         navigate("/sign-in");
       })
