@@ -22,6 +22,7 @@ import ChatLoading from "./ChatLoading";
 import { ChatState, UserInfo } from "../Context/ChatProvider";
 import axios from "axios";
 import { getSender } from "../config/ChatLogics";
+import GroupChats from "./GroupChats";
 
 export const ChatThreadsContainer = () => {
 
@@ -78,7 +79,7 @@ export const ChatThreadsContainer = () => {
       console.log(data);
 
     } catch (error) {
-      toast.error("Erruuuuor");
+      toast.error("Error");
     }
   };
   useEffect(() => {
@@ -111,7 +112,7 @@ export const ChatThreadsContainer = () => {
       ? getSender(loggedUser, chat.users)
       : chat.chatName;
 
-    return senderName && senderName.toLowerCase().includes(search.toLowerCase()); 
+    return senderName && senderName.toLowerCase().includes(search.toLowerCase());
   });
   return (
     <>
@@ -298,6 +299,8 @@ export const ChatThreadsContainer = () => {
       <SearchUsersDrawer
         openNewChatsDrawer={openNewChatsDrawer}
         setOpenNewChatsDrawer={setOpenNewChatsDrawer}
+      />
+      <GroupChats
         openModal={openModal}
         setOpenModal={setOpenModal}
       />
