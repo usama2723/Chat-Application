@@ -1,10 +1,5 @@
 import {
-  AppBar,
-  Box,
-  Drawer,
-  Avatar,
   IconButton,
-  Toolbar,
   Typography,
   Stack,
   Paper,
@@ -13,7 +8,6 @@ import React, { useEffect, useState } from "react";
 import { IoChatbubble, IoPeople, IoSearch } from "react-icons/io5";
 import { CustomMenu } from "./CustomMenu";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,6 +17,7 @@ import { ChatState, UserInfo } from "../Context/ChatProvider";
 import axios from "axios";
 import { getSender } from "../config/ChatLogics";
 import GroupChats from "./GroupChats";
+import ProfileDrawer from "./ProfileDrawer";
 
 export const ChatThreadsContainer = () => {
 
@@ -49,9 +44,7 @@ export const ChatThreadsContainer = () => {
     setAnchorEl(null);
   };
 
-  const toggleDrawer = () => {
-    setOpenDrawer(!openDrawer);
-  };
+  const toggleDrawer = () => setOpenDrawer(!openDrawer);
 
   const toggleNewChatsDrawer = () => {
     setOpenNewChatsDrawer(!openNewChatsDrawer);
@@ -64,6 +57,7 @@ export const ChatThreadsContainer = () => {
     // localStorage.removeItem("userInfo");
 
   };
+
   const fetchChats = async () => {
     console.log("user id is", user?._id);
     try {
@@ -149,12 +143,12 @@ export const ChatThreadsContainer = () => {
       </div>
 
       <div className="p-3 ">
-        <div className="flex items-center space-x-4 bg-[#2a3942] rounded-[10px] px-6 py-1">
+        <div className="flex items-center space-x-4 bg-[#202c33] rounded-[10px] px-6 py-1">
           <IoSearch className="text-[#aebac1] cursor-pointer" size={18} />
           <input
-            className="flex-1 bg-[#2a3942] text-white border-none outline-none px-2 "
+            className="flex-1 bg-[#202c33] text-white border-none outline-none px-2"
             type="text"
-            placeholder="Search or start new chat"
+            placeholder="Search"
             value={search}
             onChange={handleSearchChange}
           />
@@ -171,8 +165,8 @@ export const ChatThreadsContainer = () => {
                 elevation={3}
                 key={chat._id}
                 sx={{
-                  backgroundColor: selectedChat === chat ? "white" : "#E8E8E8",
-                  color: selectedChat === chat ? "black" : "black",
+                  backgroundColor: selectedChat === chat ? "#ffffff" : "#2a3942",
+                  color: selectedChat === chat ? "black" : "white",
                   cursor: "pointer",
                   "&:hover": {
                     backgroundColor: "#38B2AC",
@@ -200,102 +194,9 @@ export const ChatThreadsContainer = () => {
         )}
       </div>
 
-      <Drawer
-        variant="persistent"
-        open={openDrawer}
-        onClose={() => toggleDrawer()}
-        PaperProps={{
-          sx: {
-            backgroundColor: "#111b21",
-            color: "white",
-            margin: "20px",
-          },
-        }}
-      >
-        <AppBar
-          position="static"
-          sx={{ backgroundColor: "#202c33", height: 110 }}
-        >
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => toggleDrawer()}
-              sx={{ marginTop: 7 }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-
-            <Typography
-              sx={{ marginTop: 7, marginLeft: 2 }}
-              variant="h6"
-              component="div"
-            >
-              Profile
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Box
-          sx={{
-            width: 450,
-          }}
-          role="presentation"
-        >
-          <Avatar
-            sx={{
-              width: 200,
-              height: 200,
-              margin: "auto",
-              marginTop: 5,
-            }}
-            src="https://play-lh.googleusercontent.com/C9CAt9tZr8SSi4zKCxhQc9v4I6AOTqRmnLchsu1wVDQL0gsQ3fmbCVgQmOVM1zPru8UH=w240-h480-rw"
-          />
-          <Typography
-            sx={{
-              paddingTop: 5,
-              paddingLeft: 3,
-              color: "#05805d",
-              fontSize: "13px",
-            }}
-          >
-            Your Name
-          </Typography>
-          <Typography sx={{ paddingTop: 3, paddingLeft: 3, fontSize: "17px" }}>
-            〽️R $@m...♌
-          </Typography>
-          <Typography
-            sx={{
-              paddingTop: 3,
-              paddingLeft: 3,
-              fontSize: "15px",
-              color: "gray",
-            }}
-          >
-            This is not your username or pin. This name will be visible to your
-            contacts.
-          </Typography>
-          <Typography
-            sx={{
-              color: "#05805d",
-              paddingTop: 5,
-              paddingLeft: 3,
-              fontSize: "13px",
-            }}
-          >
-            About
-          </Typography>
-          <Typography
-            sx={{
-              paddingTop: 3,
-              paddingLeft: 3,
-              fontSize: "17px",
-            }}
-          >
-            ∆™ ♾️ $impli¢îTy îs My St¥le~ 😇
-          </Typography>
-        </Box>
-      </Drawer>
-
+      <ProfileDrawer
+        openDrawer={openDrawer} toggleDrawer={toggleDrawer}
+      />
       <SearchUsersDrawer
         openNewChatsDrawer={openNewChatsDrawer}
         setOpenNewChatsDrawer={setOpenNewChatsDrawer}
