@@ -3,22 +3,23 @@ import { Avatar, Box, Typography, Paper } from '@mui/material';
 import { UserInfo } from '../../Context/ChatProvider';
 
 interface UserListItemProps {
-    handleFunction: () => void; 
+    handleFunction: () => void;
     user: UserInfo;
 }
 
-const UserListItem: React.FC<UserListItemProps> = ({user, handleFunction }) => {
+const UserListItem: React.FC<UserListItemProps> = ({ user, handleFunction }) => {
     console.log("User ID:", user._id);
-    
+
     return (
-        
+
         <Paper
             elevation={3}
             onClick={handleFunction}
             sx={{
-            
                 cursor: 'pointer',
-                backgroundColor: '#E8E8E8',
+                backgroundColor: '#2a3942',
+                color: 'white',
+
                 '&:hover': {
                     backgroundColor: '#38B2AC',
                     color: 'white',
@@ -26,20 +27,16 @@ const UserListItem: React.FC<UserListItemProps> = ({user, handleFunction }) => {
                 width: '90%',
                 display: 'flex',
                 alignItems: 'center',
-                color: 'black',
                 padding: 2,
                 marginBottom: 2,
                 borderRadius: '8px',
             }}
         >
-           
             <Avatar
                 sx={{ marginRight: 2, cursor: 'pointer' }}
                 alt={user.name}
                 src={user.pic}
             />
-
-    
             <Box>
                 <Typography variant="subtitle1" component="div">
                     {user.name}
@@ -49,7 +46,7 @@ const UserListItem: React.FC<UserListItemProps> = ({user, handleFunction }) => {
                 </Typography>
             </Box>
         </Paper>
-        
+
     );
 };
 
