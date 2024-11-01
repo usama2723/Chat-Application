@@ -108,7 +108,7 @@ const GroupChats = ({
           sx: {
             height: "50vh",
             width: "30%",
-            backgroundColor: "#2a3942",
+            backgroundColor: "#111b21",
             color: "white",
             padding: 2,
             position: 'relative'
@@ -202,7 +202,13 @@ const GroupChats = ({
             />
           ))}
         </Box>
-        <Box m={2}>
+        <Box sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          marginTop: 2,
+        }}>
         {loading ? (
           <div>Loading....</div>
         ) : (
