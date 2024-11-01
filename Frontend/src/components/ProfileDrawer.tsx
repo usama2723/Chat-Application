@@ -8,6 +8,7 @@ import {
     Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { ChatState } from "../Context/ChatProvider";
 
 const ProfileDrawer = ({ openDrawer, toggleDrawer }
     :
@@ -15,6 +16,8 @@ const ProfileDrawer = ({ openDrawer, toggleDrawer }
         openDrawer: boolean;
         toggleDrawer: () => void;
     }) => {
+
+    const { user } = ChatState();
     return (
         <Drawer
             variant="persistent"
@@ -64,51 +67,63 @@ const ProfileDrawer = ({ openDrawer, toggleDrawer }
                         margin: "auto",
                         marginTop: 5,
                     }}
-                    src="https://play-lh.googleusercontent.com/C9CAt9tZr8SSi4zKCxhQc9v4I6AOTqRmnLchsu1wVDQL0gsQ3fmbCVgQmOVM1zPru8UH=w240-h480-rw"
+                    src={user?.pic}
+                    alt={user?.name}
                 />
-                <Typography
+                <Box
                     sx={{
                         paddingTop: 5,
                         paddingLeft: 3,
-                        color: "#05805d",
-                        fontSize: "13px",
-                    }}
-                >
-                    Your Name
-                </Typography>
-                <Typography sx={{ paddingTop: 3, paddingLeft: 3, fontSize: "17px" }}>
-                    〽️R $@m...♌
-                </Typography>
-                <Typography
-                    sx={{
-                        paddingTop: 3,
-                        paddingLeft: 3,
-                        fontSize: "15px",
-                        color: "gray",
-                    }}
-                >
-                    This is not your username or pin. This name will be visible to your
-                    contacts.
-                </Typography>
-                <Typography
-                    sx={{
-                        color: "#05805d",
-                        paddingTop: 5,
-                        paddingLeft: 3,
-                        fontSize: "13px",
-                    }}
-                >
-                    About
-                </Typography>
-                <Typography
-                    sx={{
-                        paddingTop: 3,
-                        paddingLeft: 3,
-                        fontSize: "17px",
-                    }}
-                >
-                    ∆™ ♾️ $impli¢îTy îs My St¥le~ 😇
-                </Typography>
+                    }}>
+                    <Typography
+                        sx={{
+
+                            color: "#05805d",
+                            fontSize: "13px",
+                        }}
+                    >
+                        Your Name
+                    </Typography>
+                    <Typography sx={{ paddingTop: 3, fontSize: "20px" }}>
+                        {user?.name}
+                    </Typography>
+                    <Typography
+                        sx={{
+                            paddingTop: 3,
+                            color: "#05805d",
+                            fontSize: "13px",
+                        }}
+                    >
+                        Your Email
+                    </Typography>
+                    <Typography
+                        sx={{
+                            paddingTop: 3,
+                            fontSize: "15px",
+                            color: "gray",
+                        }}
+                    >
+                        Email: {user?.email}
+
+                    </Typography>
+                    <Typography
+                        sx={{
+                            color: "#05805d",
+                            paddingTop: 3,
+                            fontSize: "13px",
+                        }}
+                    >
+                        About
+                    </Typography>
+                    <Typography
+                        sx={{
+                            paddingTop: 3,
+                            fontSize: "17px",
+                        }}
+                    >
+                        ∆™ ♾️ $impli¢îTy îs My St¥le~ 😇
+                    </Typography>
+                </Box>
             </Box>
         </Drawer>
     );
