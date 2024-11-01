@@ -19,7 +19,9 @@ import { getSender } from "../config/ChatLogics";
 import GroupChats from "./GroupChats";
 import ProfileDrawer from "./ProfileDrawer";
 
-export const ChatThreadsContainer = () => {
+export const ChatThreadsContainer = ({ fetchAgain }: {
+  fetchAgain: boolean;
+}) => {
 
   const [loggedUser, setLoggedUser] = useState<UserInfo | null>(null);
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
@@ -44,6 +46,8 @@ export const ChatThreadsContainer = () => {
     setAnchorEl(null);
   };
 
+
+
   const toggleDrawer = () => setOpenDrawer(!openDrawer);
 
   const toggleNewChatsDrawer = () => {
@@ -53,45 +57,46 @@ export const ChatThreadsContainer = () => {
   const handleLogout = () => {
     navigate("/sign-in");
     toast.success("Logged out successfully!");
-
-    // localStorage.removeItem("userInfo");
-
   };
 
   const fetchChats = async () => {
-    console.log("user id is", user?._id);
     try {
       const config = {
         headers: {
           Authorization: `Bearer ${user?.token}`,
         },
       };
-
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/chat`, config);
       setChats(data);
-      console.log(data);
-
     } catch (error) {
-      toast.error("Error");
+      toast.error("Error fetching chats");
     }
   };
+
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
-      setLoggedUser(JSON.parse(userInfo));
+      const parsedUser = JSON.parse(userInfo);
+      setLoggedUser(parsedUser);
+
+      const savedChats = localStorage.getItem(`${parsedUser._id}_selectedChats`);
+      if (savedChats) {
+        setChats(JSON.parse(savedChats));
+      } else {
+        fetchChats();
+      }
     } else {
       setLoggedUser(null);
     }
-    fetchChats();
-  }, []);
-
+  }, [fetchAgain]);
 
   const options = [
     { label: "New chats", callback: toggleNewChatsDrawer },
     { label: "Group chat", callback: handleCloseModal },
     { label: "Log out", callback: handleLogout },
   ];
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     setLoading(true);
@@ -101,6 +106,13 @@ export const ChatThreadsContainer = () => {
     }
   };
 
+  const handleChatSelection = (chat: any) => {
+    setSelectedChat(chat);
+
+    const userChats = chats.filter((c) => c._id === chat._id);
+    localStorage.setItem(`${user?._id}_selectedChats`, JSON.stringify(userChats));
+  };
+
   const filteredChats = chats.filter((chat) => {
     const senderName = !chat.isGroupChat
       ? getSender(loggedUser, chat.users)
@@ -108,13 +120,14 @@ export const ChatThreadsContainer = () => {
 
     return senderName && senderName.toLowerCase().includes(search.toLowerCase());
   });
+
   return (
     <>
-      <div className="bg-[#202c33] flex items-center justify-between text-white h-16 pl-3 ">
+      <div className="bg-[#202c33] flex items-center justify-between text-white h-16 pl-3">
         <div className="flex items-center space-x-4">
           <img
             src="https://play-lh.googleusercontent.com/C9CAt9tZr8SSi4zKCxhQc9v4I6AOTqRmnLchsu1wVDQL0gsQ3fmbCVgQmOVM1zPru8UH=w240-h480-rw"
-            alt=""
+            alt="User Avatar"
             className="h-10 w-10 rounded-full"
             onClick={() => setOpenDrawer(true)}
           />
@@ -122,13 +135,8 @@ export const ChatThreadsContainer = () => {
         <div className="flex items-center space-x-10 pr-3">
           <IoPeople className="text-[#aebac1] cursor-pointer" size={20} />
           <IoChatbubble className="text-[#aebac1] cursor-pointer" size={20} />
-
           <IconButton
             aria-label="more"
-            id="long-button"
-            aria-controls={open ? "long-menu" : undefined}
-            aria-expanded={open ? "true" : undefined}
-            aria-haspopup="true"
             onClick={handleClick}
           >
             <MoreVertIcon sx={{ color: "#aebac1" }} />
@@ -142,7 +150,7 @@ export const ChatThreadsContainer = () => {
         </div>
       </div>
 
-      <div className="p-3 ">
+      <div className="p-3">
         <div className="flex items-center space-x-4 bg-[#202c33] rounded-[10px] px-6 py-1">
           <IoSearch className="text-[#aebac1] cursor-pointer" size={18} />
           <input
@@ -156,7 +164,7 @@ export const ChatThreadsContainer = () => {
       </div>
 
       <div className="flex-1 overflow-y-scroll">
-        {loading ? (
+        {loading && search ? (
           <ChatLoading />
         ) : filteredChats.length > 0 ? (
           <Stack spacing={2} alignItems="center" justifyContent="center">
@@ -179,7 +187,7 @@ export const ChatThreadsContainer = () => {
                   marginBottom: 2,
                   borderRadius: "8px",
                 }}
-                onClick={() => setSelectedChat(chat)}
+                onClick={() => handleChatSelection(chat)}
               >
                 <Typography>
                   {!chat.isGroupChat
@@ -190,21 +198,15 @@ export const ChatThreadsContainer = () => {
             ))}
           </Stack>
         ) : (
-          <ChatLoading />
+          <Typography variant="body1" sx={{ textAlign: "center", color: "lightgray" }}>
+            No chats found
+          </Typography>
         )}
       </div>
 
-      <ProfileDrawer
-        openDrawer={openDrawer} toggleDrawer={toggleDrawer}
-      />
-      <SearchUsersDrawer
-        openNewChatsDrawer={openNewChatsDrawer}
-        setOpenNewChatsDrawer={setOpenNewChatsDrawer}
-      />
-      <GroupChats
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-      />
+      <ProfileDrawer openDrawer={openDrawer} toggleDrawer={toggleDrawer} />
+      <SearchUsersDrawer openNewChatsDrawer={openNewChatsDrawer} setOpenNewChatsDrawer={setOpenNewChatsDrawer} />
+      <GroupChats openModal={openModal} setOpenModal={setOpenModal} />
     </>
   );
 };
