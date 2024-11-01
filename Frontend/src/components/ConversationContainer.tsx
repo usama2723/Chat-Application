@@ -4,8 +4,17 @@ import { BsEmojiSmile } from "react-icons/bs";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa6";
+import SingleChat from "./SingleChat";
+import { ChatState } from "../Context/ChatProvider";
+import { getSender } from "../config/ChatLogics";
 
-const ConversationContainer = () => {
+
+const ConversationContainer = ({ fetchAgain, setFetchAgain }: {
+    fetchAgain: boolean;
+    setFetchAgain: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+    const { user, selectedChat, setSelectedChat } = ChatState();
+
     const [messages, setMessages] = useState<string[]>([]);
     const [newMessage, setNewMessage] = useState<string>("");
 
@@ -44,7 +53,15 @@ const ConversationContainer = () => {
                         sx={{ width: 40, height: 40 }}
                     />
                     <Typography variant="h6" sx={{ marginLeft: "10px" }}>
-                        Contact Name
+                        {selectedChat ? (
+                            !selectedChat.isGroupChat ? (
+                                getSender(user, selectedChat.users)
+                            ) : (
+                                selectedChat.chatName.toUpperCase()
+                            )
+                        ) : (
+                            " "
+                        )}
                     </Typography>
                 </Box>
                 <Box>
@@ -56,15 +73,12 @@ const ConversationContainer = () => {
             <Box
                 sx={{
                     flex: 1,
-                    overflowY: "auto",
-                    padding: "20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                    backgroundColor:"gray", 
+                    backgroundColor: "gray",
                 }}
             >
-                {messages.length === 0 ? (
+
+                <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+                {/* {messages.length === 0 ? (
                     <Typography
                         variant="body1"
                         sx={{ textAlign: "center", color: "lightgray" }}
@@ -87,7 +101,7 @@ const ConversationContainer = () => {
                             {msg}
                         </Box>
                     ))
-                )}
+                )} */}
             </Box>
 
             <Box
