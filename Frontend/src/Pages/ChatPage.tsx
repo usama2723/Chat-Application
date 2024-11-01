@@ -7,9 +7,8 @@ import ConversationContainer from "../components/ConversationContainer";
 
 const ChatPage = () => {
   const { user } = ChatState();
-
+  const [fetchAgain, setFetchAgain] = useState(false);
   const [openNewChatsDrawer, setOpenNewChatsDrawer] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
 
   return (
     <div style={{ width: "100%" }}>
@@ -17,14 +16,15 @@ const ChatPage = () => {
         <SearchUsersDrawer
           openNewChatsDrawer={openNewChatsDrawer}
           setOpenNewChatsDrawer={setOpenNewChatsDrawer}
-          openModal={openModal}
-          setOpenModal={setOpenModal}
         />
       )}
       <Box>
-        {user && <ChatThreadsContainer />}
-        {user && <ConversationContainer/>}
-
+        {user && (
+          <ChatThreadsContainer fetchAgain={fetchAgain} />
+        )}
+        {user && (
+          <ConversationContainer fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+        )}
       </Box>
     </div>
   );
