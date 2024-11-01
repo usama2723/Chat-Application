@@ -34,9 +34,6 @@ export const SearchUsersDrawer = ({
       toast.error("Please Enter Something in Search");
       return;
     }
-
-    console.log("user is", user);
-
     try {
       setLoading(true);
       const config = {
@@ -44,19 +41,14 @@ export const SearchUsersDrawer = ({
           Authorization: `Bearer ${user?.token}`,
         },
       };
-      console.log("Authorization Token:", user?.token);
-
-
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/user?search=${search}`,
         config
       );
-      console.log("Search Result Data:", data);
-
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
-      toast.error("error");
+      toast.error("Error searching");
     }
   };
 
@@ -87,7 +79,6 @@ export const SearchUsersDrawer = ({
     }
   };
 
-  console.log({ openNewChatsDrawer });
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
 
@@ -97,6 +88,7 @@ export const SearchUsersDrawer = ({
       setLoading(false);
     }
   };
+
   return (
     <Drawer
       variant="persistent"
