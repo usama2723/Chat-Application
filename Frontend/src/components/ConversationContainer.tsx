@@ -7,6 +7,7 @@ import { FaPlus } from "react-icons/fa6";
 import SingleChat from "./SingleChat";
 import { ChatState } from "../Context/ChatProvider";
 import { getSender } from "../config/ChatLogics";
+import EmojiPicker from 'emoji-picker-react';
 
 
 const ConversationContainer = ({ fetchAgain, setFetchAgain }: {
@@ -14,7 +15,7 @@ const ConversationContainer = ({ fetchAgain, setFetchAgain }: {
     setFetchAgain: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const { user, selectedChat, setSelectedChat } = ChatState();
-
+    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false)
     const [messages, setMessages] = useState<string[]>([]);
     const [newMessage, setNewMessage] = useState<string>("");
 
@@ -25,6 +26,10 @@ const ConversationContainer = ({ fetchAgain, setFetchAgain }: {
             setNewMessage("");
         }
     };
+    const handleEmojiSelect = (emojiObject: any) => {
+        setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
+    };
+
 
     return (
         <Box
@@ -113,9 +118,31 @@ const ConversationContainer = ({ fetchAgain, setFetchAgain }: {
                     backgroundColor: "#202c33",
                 }}
             >
-                <IconButton sx={{ color: "#aebac1" }}>
+
+                <IconButton 
+                    sx={{ color: "#aebac1" }}
+                    onClick={() => setShowEmojiPicker((prev: boolean) => !prev)}
+                >
                     <BsEmojiSmile size={24} />
                 </IconButton>
+
+                {showEmojiPicker && (
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            bottom: "80px",
+                            right: "46%",
+                            zIndex: 1000,
+                            overflowY: "auto",
+                            "@media (max-width: 500px)": {
+                                maxWidth: "90%",
+                                left: "5%",
+                            },
+                        }}
+                    >
+                        <EmojiPicker onEmojiClick={handleEmojiSelect} />
+                    </Box>
+                )}
                 <IconButton sx={{ color: "#aebac1" }}>
                     <FaPlus size={24} />
                 </IconButton>
