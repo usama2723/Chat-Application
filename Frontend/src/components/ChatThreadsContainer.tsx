@@ -3,6 +3,7 @@ import {
   Typography,
   Stack,
   Paper,
+  Box,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { IoChatbubble, IoPeople, IoSearch } from "react-icons/io5";
@@ -45,8 +46,6 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-
 
   const toggleDrawer = () => setOpenDrawer(!openDrawer);
 
@@ -132,12 +131,13 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
             onClick={() => setOpenDrawer(true)}
           />
         </div>
-        <div className="flex items-center space-x-10 pr-3">
+        <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8 lg:space-x-10 pr-3">
           <IoPeople className="text-[#aebac1] cursor-pointer" size={20} />
           <IoChatbubble className="text-[#aebac1] cursor-pointer" size={20} />
           <IconButton
             aria-label="more"
             onClick={handleClick}
+            className="p-1"
           >
             <MoreVertIcon sx={{ color: "#aebac1" }} />
           </IconButton>
@@ -150,18 +150,18 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
         </div>
       </div>
 
-      <div className="p-3">
-        <div className="flex items-center space-x-4 bg-[#202c33] rounded-[10px] px-6 py-1">
+      <Box sx={{ padding: 2, maxWidth: '100%' }}>
+        <div className="flex items-center bg-[#202c33] rounded-[10px] px-4 py-1 w-full">
           <IoSearch className="text-[#aebac1] cursor-pointer" size={18} />
           <input
-            className="flex-1 bg-[#202c33] text-white border-none outline-none px-2"
+            className="flex-1 bg-[#202c33] text-white border-none outline-none px-2 w-full"
             type="text"
             placeholder="Search"
             value={search}
             onChange={handleSearchChange}
           />
         </div>
-      </div>
+      </Box>
 
       <div className="flex-1 overflow-y-scroll">
         {loading && search ? (
