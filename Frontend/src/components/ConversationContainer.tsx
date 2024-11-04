@@ -4,15 +4,14 @@ import { BsEmojiSmile } from "react-icons/bs";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa6";
-// import SingleChat from "./SingleChat";
 import { ChatState } from "../Context/ChatProvider";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import EmojiPicker from 'emoji-picker-react';
 import UserProfileModal from "./UserProfileModal";
 
-const ConversationContainer = ({ fetchAgain, setFetchAgain }: {
-  fetchAgain: boolean;
-  setFetchAgain: React.Dispatch<React.SetStateAction<boolean>>;
+const ConversationContainer = ({
+  // fetchAgain: boolean;
+  // setFetchAgain: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false)
@@ -88,7 +87,6 @@ const ConversationContainer = ({ fetchAgain, setFetchAgain }: {
           }}
         >
 
-          {/* <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} /> */}
           {/* {messages.length === 0 ? (
             <Typography
               variant="body1"
