@@ -1,48 +1,120 @@
-import { Box, IconButton, TextField, Typography, Avatar } from "@mui/material";
+import { Box, IconButton, TextField, Typography, Avatar, CircularProgress } from "@mui/material";
 import { IoSend } from "react-icons/io5";
 import { BsEmojiSmile } from "react-icons/bs";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 import { ChatState } from "../Context/ChatProvider";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import EmojiPicker from 'emoji-picker-react';
 import UserProfileModal from "./UserProfileModal";
+import { toast } from "react-toastify";
+import axios from "axios";
+import ScrollableChat from "./ScrollableChat";
+import { CustomMenu } from "./CustomMenu";
 
-const ConversationContainer = ({
-  // fetchAgain: boolean;
-  // setFetchAgain: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-  const { user, selectedChat, setSelectedChat } = ChatState();
+type Message = {
+  _id: string;
+  sender: {
+    _id: string;
+    name: string;
+    pic?: string;
+  };
+  content: string;
+};
+
+const ConversationContainer = () => {
+  const { user, selectedChat } = ChatState();
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false)
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [openModal, setOpenModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      setMessages([...messages, newMessage]);
-      setNewMessage("");
-    }
-  };
+
   const handleEmojiSelect = (emojiObject: any) => {
     setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
-
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
   const handleCloseModal = () => {
     setOpenModal(!openModal);
+  };
+  const typingHandler = (e: any) => {
+    setNewMessage(e.target.value);
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const options = [
+    { label: "New Group", callback: handleCloseModal },
+  ];
+
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      };
+
+      setLoading(true);
+
+      const { data } = await axios.get<Message[]>(
+        `${import.meta.env.VITE_API_BASE_URL}/message/${selectedChat._id}`,
+        config
+      );
+      console.log(messages);
+      
+      setMessages(data);
+      setLoading(false);
+
+      // socket.emit("join chat", selectedChat._id);
+    } catch (error) {
+      toast('Error Occurred!');
+    }
+  };
+
+  useEffect(()=>{
+    fetchMessages();
+  },[selectedChat]);
+
+  const sendMessage = async (event: React.KeyboardEvent) => {
+    if (event.key === "Enter" && newMessage) {
+      // socket.emit("stop typing", selectedChat._id);
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        };
+        setNewMessage("");
+        const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/message`,
+          {
+            content: newMessage,
+            chatId: selectedChat,
+          },
+          config
+        );
+        console.log(data);
+        // socket.emit("new message", data);
+        setMessages([...messages, data]);
+      } catch (error) {
+        toast.error('Error Occurred');
+      }
+    }
   };
 
   return (
     <>
-      <Box
-        sx={{
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          backgroundColor: "#e5ddd5",
-        }}
-      >
         <Box
           sx={{
             height: '9.4%',
@@ -74,58 +146,47 @@ const ConversationContainer = ({
             </Typography>
           </Box>
           <Box>
-            <IconButton sx={{ color: "#fff" }}>
-              <MoreVertIcon />
-            </IconButton>
+          <IconButton
+            aria-label="more"
+            onClick={handleClick}
+            className="p-1"
+          >
+            <MoreVertIcon sx={{ color: "#aebac1" }} />
+          </IconButton>
+          <CustomMenu
+            anchorEl={anchorEl}
+            open={open}
+            options={options}
+            onClose={handleClose}
+          />
           </Box>
         </Box>
 
         <Box
           sx={{
+            overflowY: "auto",
             flex: 1,
+            padding: "10px",
             backgroundColor: "gray",
           }}
         >
-
-          {/* {messages.length === 0 ? (
-            <Typography
-              variant="body1"
-              sx={{ textAlign: "center", color: "lightgray" }}
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              No messages yet.
-            </Typography>
-          ) : (
-            [...messages]
-              .map((msg, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    justifyContent: msg.sender === user.id ? "flex-end" : "flex-start",
-                    mb: "4px", // Adds space between messages
-                  }}
-                >
-                  <Box
-                    sx={{
-                      backgroundColor: msg.sender === user.id ? "#dcf8c6" : "#fff",
-                      color: "#111",
-                      padding: "8px 12px",
-                      borderRadius: msg.sender === user.id ? "10px 0 10px 10px" : "0 10px 10px 10px",
-                      maxWidth: "70%", // Limit the width to avoid full span
-                      fontSize: "0.9rem",
-                      lineHeight: "1.4",
-                      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
-                      wordWrap: "break-word",
-                    }}
-                  >
-                    {msg.content}
-                  </Box>
-                </Box>
-              ))
-          )} */}
+              <CircularProgress color="inherit" size={50} />
+            </Box>
+            ) : (
+            <div className="messages">
+              <ScrollableChat messages={messages}/>
+            </div>
+          )}
 
         </Box>
-
 
         <Box
           sx={{
@@ -164,12 +225,14 @@ const ConversationContainer = ({
           <IconButton sx={{ color: "#aebac1" }}>
             <FaPlus size={24} />
           </IconButton>
+       
           <TextField
             variant="outlined"
             fullWidth
             placeholder="Type a message"
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={sendMessage}
+            onChange={typingHandler}
             sx={{
               padding: "16px",
               "& .MuiOutlinedInput-root": {
@@ -198,11 +261,10 @@ const ConversationContainer = ({
               },
             }}
           />
-          <IconButton sx={{ color: "#aebac1" }} onClick={handleSendMessage}>
+          <IconButton sx={{ color: "#aebac1" }} onClick={() => sendMessage({ key: "Enter" } as React.KeyboardEvent)}>
             <IoSend size={24} />
           </IconButton>
         </Box>
-      </Box>
       <UserProfileModal
         user={
           selectedChat && !selectedChat.isGroupChat
