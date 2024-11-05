@@ -68,15 +68,15 @@ const SignIn = () => {
     }
   }, []);
   return (
-    <div className="flex items-center bg-gray-800 justify-center min-h-screen">
+    <div className="flex items-center bg-[#006a4e] justify-center min-h-screen">
       <form
         onSubmit={SignInFunc}
-        className="max-w-[400px] w-full mx-auto bg-gray-900 p-8 px-8 rounded-lg"
+        className="max-w-[400px] w-full mx-auto bg-[#ffffff] p-8 px-8 rounded-lg"
       >
-        <h2 className="text-4xl dark:text-white font-bold text-center">
+        <h2 className="text-4xl text-gray-500 font-bold text-center">
           Sign In
         </h2>
-        <div className="flex flex-col text-gray-400 py-2">
+        <div className="flex flex-col text-gray-500 py-2">
           <label>Email:</label>
           <input
             name="email"
@@ -84,11 +84,11 @@ const SignIn = () => {
             value={email}
             onChange={handleChange}
             required
-            className="rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+            className="rounded-lg bg-slate-200 text-black  mt-2 p-2 focus:border-blue-500 focus:outline-none"
           />
         </div>
 
-        <div className="flex flex-col text-gray-400 py-2">
+        <div className="flex flex-col text-gray-500 py-2">
           <label>Password:</label>
           <input
             name="password"
@@ -96,14 +96,13 @@ const SignIn = () => {
             value={password}
             onChange={handleChange}
             required
-            className="rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+            className="rounded-lg bg-slate-200 text-black mt-2 p-2 focus:border-blue-500  focus:outline-none"
           />
           <button
             type="button"
             onClick={togglePasswordVisibility}
             className="absolute translate-x-72 translate-y-10  text-gray-500"
           >
-            {showPassword ? "Hide" : "Show"}
           </button>
         </div>
         <div className="flex justify-between text-gray-400 py-2">
@@ -125,13 +124,13 @@ const SignIn = () => {
             </Link>
           </p>
         </div>
-        <button className="w-full my-5 py-2 bg-teal-500 shadow-lg shadow-teal-500/50 hover:shadow-teal-500/40 text-white font-semibold rounded-lg">
+        <button className="w-full my-5 py-2 bg-[#006a4e] shadow-lg shadow-green-500/50 hover:shadow-green-400/50 text-white font-semibold rounded-lg">
           Sign In
         </button>
         <button
           onClick={() => {
             setEmail("guest@example.com");
-            setPassword("123456");
+            setPassword("12345678");
           }}
           className="w-full my-3 py-2 bg-red-500 shadow-lg shadow-red-500/50 hover:shadow-red-500/40 text-white font-semibold rounded-lg"
         >
