@@ -68,6 +68,8 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/chat`, config);
       setChats(data);
+
+      localStorage.setItem(`${user?._id}_chats`, JSON.stringify(data));
     } catch (error) {
       toast.error("Error fetching chats");
     }
@@ -79,20 +81,18 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
       const parsedUser = JSON.parse(userInfo);
       setLoggedUser(parsedUser);
 
-      const savedChats = localStorage.getItem(`${parsedUser._id}_selectedChats`);
+      const savedChats = localStorage.getItem(`${parsedUser._id}_chats`);
       if (savedChats) {
         setChats(JSON.parse(savedChats));
       } else {
         fetchChats();
       }
-    } else {
-      setLoggedUser(null);
     }
   }, [fetchAgain]);
-
+              
   const options = [
     { label: "New chats", callback: toggleNewChatsDrawer },
-    { label: "Group chat", callback: handleCloseModal },
+    { label: "New Group", callback: handleCloseModal },
     { label: "Log out", callback: handleLogout },
   ];
 
