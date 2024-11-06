@@ -52,7 +52,7 @@ const ConversationContainer = () => {
   };
 
   const options = [
-    { label: "New Group", callback: handleCloseModal },
+    { label: "Contact Info", callback: handleCloseModal },
   ];
 
   const fetchMessages = async () => {
