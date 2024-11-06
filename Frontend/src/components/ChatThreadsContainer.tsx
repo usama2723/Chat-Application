@@ -89,10 +89,10 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
       }
     }
   }, [fetchAgain]);
-              
+
   const options = [
     { label: "New chats", callback: toggleNewChatsDrawer },
-    { label: "New Group", callback: handleCloseModal },
+    { label: "New group", callback: handleCloseModal },
     { label: "Log out", callback: handleLogout },
   ];
 
@@ -163,7 +163,10 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
         </div>
       </Box>
 
-      <div className="flex-1 overflow-y-scroll">
+      <Box sx={{
+        flex: 1,
+        overflow: "auto",
+      }}>
         {loading && search ? (
           <ChatLoading />
         ) : filteredChats.length > 0 ? (
@@ -199,10 +202,10 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
           </Stack>
         ) : (
           <Typography variant="body1" sx={{ textAlign: "center", color: "lightgray" }}>
-            No chats found
+            No chats 
           </Typography>
         )}
-      </div>
+      </Box>
 
       <ProfileDrawer openDrawer={openDrawer} toggleDrawer={toggleDrawer} />
       <SearchUsersDrawer openNewChatsDrawer={openNewChatsDrawer} setOpenNewChatsDrawer={setOpenNewChatsDrawer} />
