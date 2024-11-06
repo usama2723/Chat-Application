@@ -147,6 +147,8 @@ const SignUp = () => {
             onClick={() => togglePasswordVisibility("password")}
             className="absolute translate-x-72 translate-y-10  text-gray-500"
           >
+            {showPassword ? "hide" : "show"}
+
           </button>
         </div>
 
@@ -165,6 +167,7 @@ const SignUp = () => {
             onClick={() => togglePasswordVisibility("confirmPassword")}
             className="absolute translate-x-72 translate-y-10  text-gray-500"
           >
+            {showConfirmPassword ? "hide" : "show"}
           </button>
         </div>
         <div className="flex justify-between text-gray-400 py-2">
