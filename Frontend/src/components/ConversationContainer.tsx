@@ -4,7 +4,7 @@ import { BsEmojiSmile } from "react-icons/bs";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa6";
-import { ChatState } from "../Context/ChatProvider";
+import { ChatState, IChat } from "../Context/ChatProvider";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import EmojiPicker from 'emoji-picker-react';
 import UserProfileModal from "./UserProfileModal";
@@ -12,6 +12,9 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import ScrollableChat from "./ScrollableChat";
 import { CustomMenu } from "./CustomMenu";
+import { io, Socket } from "socket.io-client";
+import animationData from "./animations/typing.json";
+import Lottie from "react-lottie";
 
 type Message = {
   _id: string;
@@ -23,13 +26,19 @@ type Message = {
   content: string;
 };
 
+const ENDPOINT = "http://localhost:5000";
+var socket: Socket, selectedChatCompare: IChat | undefined;;
+
 const ConversationContainer = () => {
   const { user, selectedChat } = ChatState();
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false)
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
+  const [socketConnected, setSocketConnected] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);     
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -43,10 +52,7 @@ const ConversationContainer = () => {
   const handleCloseModal = () => {
     setOpenModal(!openModal);
   };
-  const typingHandler = (e: any) => {
-    setNewMessage(e.target.value);
-  }
-
+  
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -54,6 +60,15 @@ const ConversationContainer = () => {
   const options = [
     { label: "Contact Info", callback: handleCloseModal },
   ];
+
+ const defaultOptions = {
+  loop: true,
+  autoplay: true,
+  animationData: animationData,
+  rendererSettings: {
+    preserveAspectRatio: "xMidYMid slice",
+  },
+};
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -76,19 +91,42 @@ const ConversationContainer = () => {
       setMessages(data);
       setLoading(false);
 
-      // socket.emit("join chat", selectedChat._id);
+      socket.emit("join chat", selectedChat._id);
     } catch (error) {
       toast('Error Occurred!');
     }
   };
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connected", () => setSocketConnected(true));
+    socket.on("typing", () => setIsTyping(true));
+    socket.on("stop typing", () => setIsTyping(false));
+  }, []);
 
   useEffect(()=>{
     fetchMessages();
+    selectedChatCompare = selectedChat;
   },[selectedChat]);
+
+  useEffect(() => {
+    socket.on("message received", (newMessageReceived) => {
+      if (
+        !selectedChatCompare || 
+        selectedChatCompare._id !== newMessageReceived.chat._id
+      ) 
+      {
+       // notification
+      } 
+      else {
+        setMessages([...messages, newMessageReceived]);
+      }
+  });
+  });
 
   const sendMessage = async (event: React.KeyboardEvent) => {
     if (event.key === "Enter" && newMessage) {
-      // socket.emit("stop typing", selectedChat._id);
+      socket.emit("stop typing", selectedChat?._id);
       try {
         const config = {
           headers: {
@@ -105,12 +143,32 @@ const ConversationContainer = () => {
           config
         );
         console.log(data);
-        // socket.emit("new message", data);
+        socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
         toast.error('Error Occurred');
       }
     }
+  };
+  const typingHandler = (e: any) => {
+    setNewMessage(e.target.value);
+
+    if (!socketConnected) return;
+
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat?._id);
+    }
+    let lastTypingTime = new Date().getTime();
+    var timerLength = 3000;
+    setTimeout(() => {
+      var timeNow = new Date().getTime();
+      var timeDiff = timeNow - lastTypingTime;
+      if (timeDiff >= timerLength && typing) {
+        socket.emit("stop typing", selectedChat?._id);
+        setTyping(false);
+      }
+    }, timerLength);
   };
 
   return (
@@ -186,6 +244,20 @@ const ConversationContainer = () => {
             </div>
           )}
 
+        {isTyping ? (
+          <Box
+            sx={{
+              // marginRight: 50,
+            }}
+          >
+            <Lottie
+              options={defaultOptions}
+              width={80}
+            />
+          </Box>
+        ) : (
+          <></>
+        )}
         </Box>
 
         <Box
