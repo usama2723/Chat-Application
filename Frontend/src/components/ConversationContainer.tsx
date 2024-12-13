@@ -150,26 +150,29 @@ const ConversationContainer = () => {
       }
     }
   };
-  const typingHandler = (e: any) => {
-    setNewMessage(e.target.value);
+const typingHandler = (e: any) => {
+  setNewMessage(e.target.value);
 
-    if (!socketConnected) return;
+  if (!socketConnected) return;
 
-    if (!typing) {
-      setTyping(true);
-      socket.emit("typing", selectedChat?._id);
+  if (!typing) {
+    setTyping(true);
+    socket.emit("typing", { chatId: selectedChat?._id, userId: user?._id });
+  }
+
+  let lastTypingTime = new Date().getTime();
+  const timerLength = 3000;
+
+  setTimeout(() => {
+    const timeNow = new Date().getTime();
+    const timeDiff = timeNow - lastTypingTime;
+
+    if (timeDiff >= timerLength && typing) {
+      socket.emit("stop typing", { chatId: selectedChat?._id, userId: user?._id });
+      setTyping(false);
     }
-    let lastTypingTime = new Date().getTime();
-    var timerLength = 3000;
-    setTimeout(() => {
-      var timeNow = new Date().getTime();
-      var timeDiff = timeNow - lastTypingTime;
-      if (timeDiff >= timerLength && typing) {
-        socket.emit("stop typing", selectedChat?._id);
-        setTyping(false);
-      }
-    }, timerLength);
-  };
+  }, timerLength);
+};
 
   return (
     <>
@@ -179,7 +182,7 @@ const ConversationContainer = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "10px 16px",
+            padding: "16px",
             backgroundColor: "#202c33",
             color: "#fff",
           }}
@@ -247,7 +250,9 @@ const ConversationContainer = () => {
         {isTyping ? (
           <Box
             sx={{
-              // marginRight: 50,
+              display: "flex",
+              justifyContent: "flex-end", // Use `flex-end` instead of `end`
+              paddingRight: "16px", // Add padding to push it away from the edge if needed
             }}
           >
             <Lottie
@@ -255,21 +260,18 @@ const ConversationContainer = () => {
               width={80}
             />
           </Box>
-        ) : (
-          <></>
-        )}
+        ) : null}
         </Box>
 
         <Box
           sx={{
-            height: '10%',
+            height: '70px',
             display: "flex",
             alignItems: "center",
             padding: "16px",
             backgroundColor: "#202c33",
           }}
         >
-
           <IconButton
             sx={{ color: "#aebac1" }}
             onClick={() => setShowEmojiPicker((prev: boolean) => !prev)}
@@ -303,15 +305,13 @@ const ConversationContainer = () => {
             fullWidth
             placeholder="Type a message"
             value={newMessage}
-              onKeyDown={sendMessage}
+            onKeyDown={sendMessage}
             onChange={typingHandler}
             sx={{
-              padding: "16px",
               "& .MuiOutlinedInput-root": {
-                height: "45px",
                 borderRadius: "10px",
                 backgroundColor: "#2a3942",
-                color: "white",
+                color: "#2a3942",
                 "& fieldset": {
                   borderColor: "#2a3942",
                 },
