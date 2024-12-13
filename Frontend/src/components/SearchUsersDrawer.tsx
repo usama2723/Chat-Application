@@ -11,7 +11,7 @@ import { IoSearch } from "react-icons/io5";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { ChatState, } from "../Context/ChatProvider";
+import { ChatState, UserInfo, } from "../Context/ChatProvider";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "./UserAvatar/UserListItem";
@@ -26,7 +26,7 @@ export const SearchUsersDrawer = ({
   const [loadingChat, setLoadingChat] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setSelectedChat, user, chats, setChats } = ChatState();
-  const [searchResult, setSearchResult] = useState();
+  const [searchResult, setSearchResult] = useState<UserInfo[] | null>(null);
   const [search, setSearch] = useState("");
 
   const handleSearch = async () => {
@@ -147,7 +147,6 @@ export const SearchUsersDrawer = ({
         role="presentation"
       >
         {loading ? <ChatLoading /> : (
-
           searchResult?.map((user) => (
             <UserListItem
               key={user._id}
