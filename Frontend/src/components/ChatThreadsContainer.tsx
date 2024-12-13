@@ -23,7 +23,7 @@ import ProfileDrawer from "./ProfileDrawer";
 export const ChatThreadsContainer = ({ fetchAgain }: {
   fetchAgain: boolean;
 }) => {
-
+  const [searchResult, setSearchResult] = useState();
   const [loggedUser, setLoggedUser] = useState<UserInfo | null>(null);
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const [loading, setLoading] = useState(false);
@@ -57,6 +57,29 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
     navigate("/sign-in");
     toast.success("Logged out successfully!");
   };
+  const handleSearch = async () => {
+    if (!search) {
+      toast.error("Please Enter Something in Search");
+      return;
+    }
+    try {
+      setLoading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      };
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/user?search=${search}`,
+        config
+      );
+      setLoading(false);
+      setSearchResult(data);
+    } catch (error) {
+      toast.error("Error searching");
+    }
+  };
+
 
   const fetchChats = async () => {
     try {
@@ -122,16 +145,16 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
 
   return (
     <>
-      <div className="bg-[#202c33] flex items-center justify-between text-white h-16 pl-3">
-        <div className="flex items-center space-x-4">
+      <Box className="bg-[#202c33] flex items-center justify-between text-white h-16 pl-3">
+        <Box className="flex items-center space-x-4">
           <img
             src="https://play-lh.googleusercontent.com/C9CAt9tZr8SSi4zKCxhQc9v4I6AOTqRmnLchsu1wVDQL0gsQ3fmbCVgQmOVM1zPru8UH=w240-h480-rw"
             alt="User Avatar"
             className="h-10 w-10 rounded-full"
             onClick={() => setOpenDrawer(true)}
           />
-        </div>
-        <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8 lg:space-x-10 pr-3">
+        </Box>
+        <Box className="flex items-center space-x-4 sm:space-x-6 md:space-x-8 lg:space-x-10 pr-3">
           <IoPeople className="text-[#aebac1] cursor-pointer" size={20} />
           <IoChatbubble className="text-[#aebac1] cursor-pointer" size={20} />
           <IconButton
@@ -147,12 +170,16 @@ export const ChatThreadsContainer = ({ fetchAgain }: {
             options={options}
             onClose={handleClose}
           />
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       <Box sx={{ padding: 2, maxWidth: '100%' }}>
         <div className="flex items-center bg-[#202c33] rounded-[10px] px-4 py-1 w-full">
-          <IoSearch className="text-[#aebac1] cursor-pointer" size={18} />
+          <IoSearch
+            onClick={handleSearch}
+            className="text-[#aebac1] cursor-pointer"
+            size={18}
+          />
           <input
             className="flex-1 bg-[#202c33] text-white border-none outline-none px-2 w-full"
             type="text"
